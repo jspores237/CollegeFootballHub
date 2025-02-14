@@ -2,8 +2,10 @@ package com.example.CollegeFootballHub;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
@@ -20,35 +22,41 @@ public class TeamService {
     @Autowired
     public TeamRepository teamRepository;
 
-    private static final String API_URL = "https://api.sportradar.com/ncaafb/trial/v7/en/league/teams.json";
-
-
-
-//My test dummy get methods for the api wiring
-    public List<Team> getAllTeams() {
-        String url = API_URL + "?api_key=" + apiKey; // Construct the full API URL by appending the API key as a query parameter
-        ResponseEntity<List<Team>> response = restTemplate.exchange(  // Make an HTTP GET request to the constructed URL and expect a response containing a list of Team objects
-                url, // The URL to send the request to
-                HttpMethod.GET, // The HTTP method to use (GET in this case)
-                null, // The request entity (null because no request body or headers are needed for a GET request)
-                new ParameterizedTypeReference<List<Team>>() {} // The expected response type, specified using a ParameterizedTypeReference to handle generic types
-        );
-            return response.getBody(); // Return the body of the response, which contains the list of Team objects
+    @Autowired
+    public TeamService(TeamRepository teamRepository) {
+        this.teamRepository = teamRepository;
     }
 
 
-    public Team getTeamById(Long id) {
-        String url = API_URL + "/" + id + "?api_key=" + apiKey;
-        ResponseEntity<Team> response = restTemplate.exchange(
-          url,
-          HttpMethod.GET,
-          null,
-          Team.class
-          //new ParameterizedTypeReference<Team>() {}
+
+    private static final String API_URL = "https://api.sportradar.com/ncaafb/trial/v7/en/league/teams.json";
+
+    // Method to get all teams
+    public List<Team> getAllTeams() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + apiKey);  // Add the Authorization header with the API key
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);  // Wrap headers in HttpEntity
+
+        ResponseEntity<List<Team>> response = restTemplate.exchange(  // Make the GET request
+                API_URL,
+                HttpMethod.GET,
+                entity,  // Add HttpEntity to include headers
+                new ParameterizedTypeReference<List<Team>>() {
+                } // Expected response type
         );
+        return response.getBody();  // Return the body containing the list of teams
+    }
 
-        return response.getBody();
-}
+    // Method to get a team by ID
+// Method to get a team by ID
+    public Team getTeamById(Long id) {
+        List<Team> teams = getAllTeams();  // Get all teams
+        return teams.stream()  // Use Java streams to find the team by ID
+                .filter(team -> team.getId() != null && team.getId().equals(id))  // Match the ID
+                .findFirst()  // Return the first match
+                .orElseThrow(() -> new RuntimeException("Team not found with ID: " + id));  // Handle case where no match is found
+    }
 
 
 
@@ -61,7 +69,10 @@ public class TeamService {
 
 
 
-    public Team createTeam(Team team) {
+
+
+/*
+public Team createTeam(Team team) {
         return teamRepository.save(team);
     }
 
@@ -79,5 +90,5 @@ public class TeamService {
 
     public void deleteAllTeams() {
         teamRepository.deleteAll();
-    }
+    } */
 }

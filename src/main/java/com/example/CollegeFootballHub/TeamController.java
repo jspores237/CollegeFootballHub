@@ -27,6 +27,7 @@ public class TeamController {
         return ResponseEntity.ok(team);
     }
 
+    /*
     @PostMapping
     public ResponseEntity<Team> createTeam(@RequestBody Team team) {
         Team newTeam = teamService.createTeam(team);
@@ -47,5 +48,5 @@ public class TeamController {
     @DeleteMapping("/all")
     public void deleteAllTeams() {
         teamService.deleteAllTeams();
-    }
+    } */
 }

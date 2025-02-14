@@ -8,25 +8,25 @@ public class Team {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public String id;
+    public Long id;
     public String name;
     public String market;
     public String alias;
 
     public Team() {}
 
-    public Team(String id, String name, String market, String alias) {
+    public Team(Long id, String name, String market, String alias) {
         this.id = id;
         this.name = name;
         this.market = market;
         this.alias = alias;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
