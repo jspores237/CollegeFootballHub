@@ -1,5 +1,4 @@
 package com.example.CollegeFootballHub.entity;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,49 +7,47 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+
 @Getter
 @Setter
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Table("team") // R2DBC uses @Table instead of @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)  // Ignore unknown JSON properties during deserialization
+@Table("team")  // Maps this class to the "team" database table (R2DBC annotation)
 public class Team {
 
-    @Id // Use Spring Data's @Id, not Jakarta's
-    private Long id;
+    @Id  // Marks this field as the primary key
+    private Long id;  // Unique identifier for the team
 
-    @Version
-    private Long version;
+    @Version  // Used for optimistic locking in database operations
+    private Long version;  // Version field for concurrency control
 
-    private String school;
-    private String mascot;
-    private String abbreviation;
+    private String school;  // Name of the school/university
+    private String mascot;  // Team mascot name
+    private String abbreviation;  // School abbreviation
 
-    // Complex collections like @ElementCollection aren't directly supported
-    // You'd need to handle these differently, such as:
-    // 1. JSON column
-    // 2. Separate table with joins
-    // 3. Comma-separated string
-    private String alternateNames; // Would need conversion to/from List<String>
+    // String representation of a list - stored as comma-separated values
+    // Example: "Alternate Name 1,Alternate Name 2"
+    private String alternateNames;
 
-    private String conference;
-    private String division;
-    private String classification;
-    private String color;
+    private String conference;  // Athletic conference (SEC, Big Ten, etc.)
+    private String division;  // Division within conference
+    private String classification;  // NCAA classification (FBS, FCS)
+    private String color;  // Primary team color (hex code without #)
 
-    @Column("alternate_color")
-    private String alternateColor;
+    @Column("alternate_color")  // Maps to database column with snake_case naming
+    private String alternateColor;  // Secondary team color
 
-    // Another collection that needs special handling
-    private String logos; // Would need conversion to/from List<String>
+    // String representation of a list of logo URLs - stored as comma-separated values
+    private String logos;
 
-    private String twitter;
+    private String twitter;  // Twitter handle
 
-    // Embedded objects need to be flattened or stored as JSON
-    private String locationCity;
-    private String locationState;
-    private Double locationLatitude;
-    private Double locationLongitude;
+    // Flattened location fields from the nested Location object in API
+    private String locationCity;  // City where team is located
+    private String locationState;  // State where team is located
+    private Double locationLatitude;  // Stadium latitude
+    private Double locationLongitude;  // Stadium longitude
 
-    // Default constructor
+    // Default constructor required by Spring Data
     public Team() {
     }
 
